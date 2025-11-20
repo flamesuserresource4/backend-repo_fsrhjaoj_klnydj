@@ -1,48 +1,56 @@
 """
-Database Schemas
+Database Schemas for Trucker App (RU)
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
-
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Each Pydantic model corresponds to a MongoDB collection.
+Collection name = lowercase of class name.
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime
 
-# Example schemas (replace with your own):
+class TruckerUser(BaseModel):
+    handle: str = Field(..., description="Уникальный позывной/ник")
+    name: str = Field(..., description="Имя и фамилия")
+    region: Optional[str] = Field(None, description="Регион или база")
+    truck_model: Optional[str] = Field(None, description="Модель грузовика")
+    experience_years: Optional[int] = Field(0, ge=0, le=80, description="Стаж")
+    bio: Optional[str] = Field(None, description="О себе")
+    is_admin: bool = Field(False, description="Админ ли пользователь")
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+class Cafe(BaseModel):
+    title: str = Field(..., description="Название кафе")
+    highway: Optional[str] = Field(None, description="Трасса/участок")
+    location: Optional[str] = Field(None, description="Координаты или населённый пункт")
+    description: Optional[str] = Field(None, description="За что любят")
+    rating: Optional[float] = Field(4.5, ge=0, le=5)
+    added_by: Optional[str] = Field(None, description="Позывной добавившего")
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+class QuizQuestion(BaseModel):
+    question: str
+    options: List[str]
+    correct_index: int = Field(..., ge=0, le=3)
+    topic: Optional[str] = Field(None, description="Тема: ПДД, География, Знаки")
+    difficulty: Optional[str] = Field("normal", description="easy/normal/hard")
 
-# Add your own schemas here:
-# --------------------------------------------------
+class NewsItem(BaseModel):
+    title: str
+    summary: str
+    source: Optional[str] = None
+    url: Optional[str] = None
+    date: Optional[datetime] = None
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class GuideEntry(BaseModel):
+    title: str
+    content: str
+    tag: Optional[str] = None
+
+class TruckHistory(BaseModel):
+    title: str
+    era: Optional[str] = None
+    content: str
+    image: Optional[str] = None
+
+class ChatMessage(BaseModel):
+    handle: str
+    message: str
